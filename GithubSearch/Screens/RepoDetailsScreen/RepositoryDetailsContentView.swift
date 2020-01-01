@@ -62,14 +62,17 @@ class RepositoryDetailsContentView: UIView {
         issuesCountLabel.textAlignment = .right
         issuesCountLabel.font = issuesCountLabel.font.withSize(14)
 
-        createdLabel.textAlignment = .left
-        createdLabel.font = createdLabel.font.withSize(6)
+        createdLabel.textAlignment = .center
+        createdLabel.font = createdLabel.font.withSize(10)
+        createdLabel.numberOfLines = 2
 
-        updatedLabel.textAlignment = .left
-        updatedLabel.font = updatedLabel.font.withSize(6)
+        updatedLabel.textAlignment = .center
+        updatedLabel.font = updatedLabel.font.withSize(10)
+        updatedLabel.numberOfLines = 2
 
-        pushedLabel.textAlignment = .left
-        pushedLabel.font = pushedLabel.font.withSize(6)
+        pushedLabel.textAlignment = .center
+        pushedLabel.font = pushedLabel.font.withSize(10)
+        pushedLabel.numberOfLines = 2
 
         languageLabel.textAlignment = .center
         languageLabel.font = languageLabel.font.withSize(20)
@@ -181,15 +184,15 @@ class RepositoryDetailsContentView: UIView {
         niceFormatter.dateFormat = "MMM d, h:mm a"
 
         if let createdDate = formatter.date(from: details.created ?? "") {
-            createdLabel.text = niceFormatter.string(from: createdDate)
+            createdLabel.text = "Created on: \n" + niceFormatter.string(from: createdDate)
         }
 
         if let updatedDate = formatter.date(from: details.created ?? "") {
-            updatedLabel.text = niceFormatter.string(from: updatedDate)
+            updatedLabel.text = "Last updated on: \n" + niceFormatter.string(from: updatedDate)
         }
 
         if let pushedDate = formatter.date(from: details.created ?? "") {
-            pushedLabel.text = niceFormatter.string(from: pushedDate)
+            pushedLabel.text = "Last pushed on: \n" + niceFormatter.string(from: pushedDate)
         }
 
         languageLabel.text = details.language ?? "Unknown language"

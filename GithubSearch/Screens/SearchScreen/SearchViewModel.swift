@@ -14,25 +14,26 @@ class SearchViewModel {
 
     let searchText = BehaviorRelay(value: "")
     let sort = BehaviorRelay(value: "stars")
-    let showLoading = BehaviorRelay<Bool>(value: false)
+    let showLoading = BehaviorRelay<Bool>(value: true)
 
     lazy var results: Observable<[Repository]> = {
         Observable.combineLatest(self.searchText.asObservable(), self.sort.asObservable())
             .flatMapLatest(searchRepos)
     }()
 
-    func searchRepos(_ searchText: String, _ sort: String) -> Observable<[Repository]> {
-        showLoading.accept(true)
+    private func searchRepos(_ searchText: String, _ sort: String) -> Observable<[Repository]> {
         let text = searchText.replacingOccurrences(of: " ", with: "+")
         guard !text.isEmpty,
             let url = URL(string: "https://api.github.com/search/repositories?q=\(text)&sort=\(sort)") else {
+                showLoading.accept(true)
                 return Observable.just([])
         }
+        showLoading.accept(false)
         return URLSession.shared.rx.json(url: url)
             .map(transformJSON)
     }
 
-    func transformJSON(json: Any) -> [Repository] {
+    private func transformJSON(json: Any) -> [Repository] {
         guard let searchJSON = json as? [String: Any] else {
             return []
         }
@@ -63,7 +64,7 @@ class SearchViewModel {
             repositories.append(repository)
         }
 
-        showLoading.accept(false)
+        showLoading.accept(true)
         return repositories
     }
 }

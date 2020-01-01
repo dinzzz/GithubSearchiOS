@@ -109,10 +109,7 @@ class SearchResultCell: UITableViewCell {
         watchersCountLabel.text = "Watchers: " + String(repository.watchersCount)
         issuesCountLabel.text = "Issues: " + String(repository.issueCount)
 
-        let avatarImageURL = URL(string: repository.ownerAvatarURL)
-        let data = try? Data(contentsOf: avatarImageURL!)
-        avatarImageView.image = UIImage(data: data!)
-
+        avatarImageView.imageFromServerURL(urlString: repository.ownerAvatarURL)
         avatarImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(avatarTapped)))
     }
 
@@ -121,5 +118,21 @@ class SearchResultCell: UITableViewCell {
             return
         }
         delegate?.didTapAvatar(username: userName)
+    }
+}
+
+extension UIImageView {
+    public func imageFromServerURL(urlString: String) {
+        self.image = nil
+        URLSession.shared.dataTask(with: NSURL(string: urlString)! as URL, completionHandler: { (data, response, error) -> Void in
+            if error != nil {
+                return
+            }
+            DispatchQueue.main.async(execute: { () -> Void in
+                let image = UIImage(data: data!)
+                self.image = image
+            })
+
+        }).resume()
     }
 }

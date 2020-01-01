@@ -33,6 +33,7 @@ class SearchViewController: UIViewController {
         setupTableView()
         setupSearchController()
         layout()
+        activityIndicator.startAnimating()
         
         viewModel.results
             .catchError { [weak self] error -> Observable<[Repository]> in
@@ -46,6 +47,11 @@ class SearchViewController: UIViewController {
         }
         .disposed(by: disposeBag)
 
+        viewModel.showLoading.asObservable()
+            .observeOn(MainScheduler.instance)
+            .bind(to: activityIndicator.rx.isHidden)
+            .disposed(by: disposeBag)
+
         tableView.rx.modelSelected(Repository.self)
             .subscribe(onNext: {
                 let repoVC = RepositoryDetailsViewController(repository: $0)
@@ -57,7 +63,7 @@ class SearchViewController: UIViewController {
             .disposed(by: disposeBag)
     }
 
-    func setupButtons() {
+    private func setupButtons() {
         starsButton.setTitle("Stars", for: .normal)
         starsButton.backgroundColor = .lightGray
 
@@ -90,7 +96,7 @@ class SearchViewController: UIViewController {
         .disposed(by: disposeBag)
     }
 
-    func setupTableView() {
+    private func setupTableView() {
         tableView = UITableView(frame: self.view.frame, style: .plain)
 
         activityIndicator.center = tableView.center
@@ -102,14 +108,14 @@ class SearchViewController: UIViewController {
         view.addSubview(tableView)
     }
 
-    func setupSearchController() {
+    private func setupSearchController() {
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.placeholder = "Search Github"
         tableView.tableHeaderView = searchController.searchBar
         definesPresentationContext = true
     }
 
-    func layout() {
+    private func layout() {
         starsButton.snp.makeConstraints {
             $0.top.equalToSuperview().offset(50)
             $0.leading.equalToSuperview().offset(10)
